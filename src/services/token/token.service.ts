@@ -1,14 +1,16 @@
 import { Model } from 'sequelize'
 import jwt from 'jsonwebtoken'
 
-import { TokenModel } from '../models/index.model'
-import { IUserDto } from '../types/user.type'
-import { IToken } from '../types/token.type'
+import { TokenModel } from '../../models/index.model'
+import { IUserDto } from '../../types/user.type'
+import { IToken } from '../../types/token.type'
 
-class TokenServiceClass {
-	genereteTokens(
-		payload: IUserDto
-	): { access_token: string; refresh_token: string } {
+export const TokenService = {
+	genereteTokens(user: IUserDto): {
+		access_token: string
+		refresh_token: string
+	} {
+		const payload = { ...user }
 		const access_token = jwt.sign(payload, process.env.JWT_ACCESS_SECRET_KEY, {
 			expiresIn: '15m'
 		})
@@ -19,20 +21,17 @@ class TokenServiceClass {
 		)
 
 		return { access_token, refresh_token }
-	}
+	},
 
-	async findToken(refresh_token: string): Promise<Model<IToken>> {
+	async findToken(refresh_token: string) {
 		const token = await TokenModel.findOne<Model<IToken>>({
 			where: { refresh_token }
 		})
 
 		return token
-	}
+	},
 
-	async saveToken(
-		refresh_token: string,
-		user_id: number
-	): Promise<Model<IToken>> {
+	async saveToken(refresh_token: string, user_id: number) {
 		const existing_token = await TokenModel.findOne<Model<IToken>>({
 			where: { userId: user_id }
 		})
@@ -49,14 +48,14 @@ class TokenServiceClass {
 		})
 
 		return token
-	}
+	},
 
 	async removeToken(refresh_token: string) {
-		const token = await TokenModel.destroy<
-			Model<Omit<IToken, 'userId'>, string>
-		>({ where: { refresh_token } })
+		const token = await TokenModel.destroy<Model<IToken>>({
+			where: { refresh_token }
+		})
 		return token
-	}
+	},
 
 	validateAccessToken(access_token: string) {
 		try {
@@ -68,7 +67,7 @@ class TokenServiceClass {
 		} catch (error) {
 			return null
 		}
-	}
+	},
 
 	validateRefreshToken(refresh_token: string) {
 		try {
@@ -82,5 +81,3 @@ class TokenServiceClass {
 		}
 	}
 }
-
-export const TokenService = new TokenServiceClass()

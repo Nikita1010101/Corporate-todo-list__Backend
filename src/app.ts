@@ -4,9 +4,9 @@ import express from 'express'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
 
-import { authRouter } from './routes/index.route'
+import { mainRouter } from './routes/index.route'
 import { sequlize } from './db'
-import { authMiddleWare } from './middlewares/auth.middleware'
+import { errorMiddleWare } from './middlewares/error.middleware'
 
 const app = express()
 
@@ -20,8 +20,8 @@ app.use(
 	})
 )
 app.use(cookieParser())
-app.use('/api', authRouter)
-app.use(authMiddleWare)
+app.use('/api', mainRouter)
+app.use(errorMiddleWare)
 
 const start = async () => {
 	try {
@@ -32,7 +32,7 @@ const start = async () => {
 			console.log(`Сервер успешно запущен на ${PORT} порту`)
 		})
 	} catch (error) {
-		throw error
+		return new Error()
 	}
 }
 

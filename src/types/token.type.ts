@@ -1,5 +1,6 @@
-export interface IToken {
-  id?: number
-  refresh_token: string 
-  userId: number
+import { IDefaultValues } from './default.type'
+
+export interface IToken extends IDefaultValues {
+	refresh_token: string
+	userId: number
 }

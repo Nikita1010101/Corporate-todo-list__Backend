@@ -10,7 +10,7 @@ export const taskModelData = {
 	title: { type: DataTypes.STRING, allowNull: false },
 	description: { type: DataTypes.STRING, allowNull: false },
 	deadline: { type: DataTypes.STRING, allowNull: false },
-	update_date: { type: DataTypes.STRING, allowNull: false },
+	update_date: { type: DataTypes.DATE, allowNull: false },
 	priority: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 1 },
 	status: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }
 }

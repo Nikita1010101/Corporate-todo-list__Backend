@@ -7,12 +7,12 @@ import { taskModelData } from './task.model'
 import { tokenModelData } from './token.model'
 import { userModelData } from './user.model'
 
-const UserModel = sequlize.define('user', userModelData)
-const TaskModel = sequlize.define('task', taskModelData)
-const TokenModel = sequlize.define('token', tokenModelData)
-const CreatorModel = sequlize.define('creator', creatorModelData)
-const ResponsibleModel = sequlize.define('responsible', responsibleModelData)
-const SupervisorModel = sequlize.define('supervisor', supervisorModelData)
+export const UserModel = sequlize.define('user', userModelData)
+export const TaskModel = sequlize.define('task', taskModelData)
+export const TokenModel = sequlize.define('token', tokenModelData)
+export const CreatorModel = sequlize.define('creator', creatorModelData)
+export const ResponsibleModel = sequlize.define('responsible', responsibleModelData)
+export const SupervisorModel = sequlize.define('supervisor', supervisorModelData)
 
 UserModel.hasMany(TaskModel)
 TaskModel.belongsTo(UserModel)
@@ -28,12 +28,3 @@ CreatorModel.belongsTo(TaskModel)
 
 TaskModel.hasOne(ResponsibleModel)
 ResponsibleModel.belongsTo(TaskModel)
-
-export {
-	UserModel,
-	TaskModel,
-	TokenModel,
-	CreatorModel,
-	ResponsibleModel,
-	SupervisorModel
-}

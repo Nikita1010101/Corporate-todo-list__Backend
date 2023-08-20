@@ -10,8 +10,6 @@
     "dev": "tsc && nodemon dist/app.js"
   },
   "dependencies": {
-    "@types/bcrypt": "^5.0.0",
-    "@types/jsonwebtoken": "^9.0.2",
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -24,11 +22,16 @@
     "sequelize-typescript": "^2.1.5"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.0",
     "@types/cookie-parser": "^1.4.3",
     "@types/cors": "^2.8.13",
     "@types/express": "^4.17.17",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^20.4.5",
     "@types/typescript": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.4.0",
+    "@typescript-eslint/parser": "^6.4.0",
+    "eslint": "^8.47.0",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6"

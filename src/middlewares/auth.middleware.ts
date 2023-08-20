@@ -1,9 +1,11 @@
-import { NextFunction, Request, Response } from 'express'
-import { TokenService } from '../services/token.service'
+import { NextFunction, Response } from 'express'
+
+import { TokenService } from '../services/token/token.service'
 import { ApiError } from '../exceptions/api.error'
+import { IUser, TRequestWithUser } from '../types/user.type'
 
 export const authMiddleWare = (
-	req: Request,
+	req: TRequestWithUser,
 	res: Response,
 	next: NextFunction
 ) => {
@@ -20,11 +22,13 @@ export const authMiddleWare = (
 			throw next(ApiError.UnautorizedError())
 		}
 
-		const is_valid_token = TokenService.validateAccessToken(access_token)
+		const user = TokenService.validateAccessToken(access_token)
 
-		if (!is_valid_token) {
+		if (!user) {
 			throw next(ApiError.UnautorizedError())
 		}
+
+		req.user = user as IUser
 
 		next()
 	} catch (error) {

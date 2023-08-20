@@ -2,12 +2,13 @@ import { NextFunction, Request, RequestHandler, Response } from 'express'
 import { validationResult } from 'express-validator'
 
 import { ApiError } from '../exceptions/api.error'
-import { IUser } from '../types/user.type'
-import { UserService } from '../services/user.service'
+import { AuthService } from '../services/auth/auth.service'
+import { REFRESH_TOKEN } from '../constants/token'
+import { ILogin, IRegistration } from '../types/auth.type'
 
-class UserControllerClass {
+class AuthControllerClass {
 	static setCookies(res: Response, refresh_token: string) {
-		res.cookie('refreshToken', refresh_token, {
+		res.cookie(REFRESH_TOKEN, refresh_token, {
 			maxAge: 1000 * 60 * 60 * 24 * 30,
 			httpOnly: true
 		})
@@ -25,11 +26,11 @@ class UserControllerClass {
 				return next(ApiError.BadRequest('Validation error!', errors.array()))
 			}
 
-			const body = req.body as IUser
+			const body = req.body as IRegistration
 
-			const user = await UserService.registration(body)
+			const user = await AuthService.registration(body)
 
-			UserControllerClass.setCookies(res, user.refresh_token)
+			AuthControllerClass.setCookies(res, user.refresh_token)
 
 			res.send(user)
 		} catch (error) {
@@ -43,17 +44,11 @@ class UserControllerClass {
 		next: NextFunction
 	) => {
 		try {
-			const errors = validationResult(req)
+			const { email, password } = req.body as ILogin
 
-			if (!errors.isEmpty()) {
-				return next(ApiError.BadRequest('Validation error!', errors.array()))
-			}
+			const user = await AuthService.login(email, password)
 
-			const { email, password } = req.body as Pick<IUser, 'email' | 'password'>
-
-			const user = await UserService.login(email, password)
-
-			UserControllerClass.setCookies(res, user.refresh_token)
+			AuthControllerClass.setCookies(res, user.refresh_token)
 
 			res.send(user)
 		} catch (error) {
@@ -67,11 +62,11 @@ class UserControllerClass {
 		next: NextFunction
 	) => {
 		try {
-			const { refresh_token } = req.cookies as { refresh_token: string }
+			const refresh_token = req.cookies.refresh_token as string
 
-			const token = await UserService.logout(refresh_token)
+			const token = await AuthService.logout(refresh_token)
 
-			res.clearCookie('refresh_token')
+			res.clearCookie(REFRESH_TOKEN)
 
 			res.send(token)
 		} catch (error) {
@@ -85,11 +80,11 @@ class UserControllerClass {
 		next: NextFunction
 	) => {
 		try {
-			const { refresh_token } = req.cookies as { refresh_token: string }
+			const { refresh_token } = req.cookies
 
-			const user = await UserService.refresh(refresh_token)
+			const user = await AuthService.refresh(refresh_token)
 
-			UserControllerClass.setCookies(res, user.refresh_token)
+			AuthControllerClass.setCookies(res, user.refresh_token)
 
 			res.send(user)
 		} catch (error) {
@@ -98,4 +93,4 @@ class UserControllerClass {
 	}
 }
 
-export const UserController = new UserControllerClass()
+export const AuthController = new AuthControllerClass()
