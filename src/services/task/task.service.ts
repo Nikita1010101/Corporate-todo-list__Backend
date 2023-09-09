@@ -9,13 +9,14 @@ import {
 } from '../../models/index.model'
 import { ICreateTask, ITask } from '../../types/task.type'
 import { ApiError } from '../../exceptions/api.error'
-import { ICreator, IResponsible, ISupervisor } from '../../types/user.type'
+import { ICreator, IResponsible, ISupervisor, IUser } from '../../types/user.type'
 import {
 	checkIsSubordinate,
 	formatResponsibleFromTasks,
 	getCreatedTasksId,
 	checkIsCreator
 } from './task.hepler'
+import { TaskError } from './task.error'
 
 export const TaskService = {
 	async getTasks(user_id: number) {
@@ -31,7 +32,7 @@ export const TaskService = {
 
 		const tasksId = getCreatedTasksId(responsibledTasks, createdTasks)
 
-		const tasks = await TaskModel.findAll<Model<ITask>>({
+		const tasks = await TaskModel.findAll<Model<ITask & { user: IUser }>>({
 			where: { id: tasksId },
 			include: { model: UserModel }
 		})
@@ -43,7 +44,7 @@ export const TaskService = {
 
 	async addTask({ creator_id, responsible_id, ...data }: ICreateTask) {
 		if (creator_id === responsible_id) {
-			throw ApiError.BadRequest('Dont correct a doing!')
+			throw ApiError.BadRequest(TaskError.DONT_CORRECT)
 		}
 
 		const subordinates = await SupervisorModel.findAll<Model<ISupervisor>>({
@@ -53,7 +54,7 @@ export const TaskService = {
 		const is_subordinate = checkIsSubordinate(subordinates, [responsible_id])
 
 		if (!is_subordinate) {
-			throw ApiError.BadRequest('Responsible not is your subordinate!')
+			throw ApiError.BadRequest(TaskError.NOT_SUBORDINATE)
 		}
 
 		const task = await TaskModel.create<Model<ITask>>({
@@ -80,7 +81,7 @@ export const TaskService = {
 		})
 
 		if (!task) {
-			throw ApiError.BadRequest('Task not found!')
+			throw ApiError.BadRequest(TaskError.NOT_FOUND)
 		}
 
 		const subordinates = await SupervisorModel.findAll<Model<ISupervisor>>({
@@ -98,7 +99,7 @@ export const TaskService = {
 		const is_creator = checkIsCreator(creator, user_id)
 
 		if (!is_subordinate || !is_creator) {
-			throw ApiError.Forbbiden('Access denied!')
+			throw ApiError.Forbbiden(TaskError.ACCESS_DENIED)
 		}
 
 		return task.update(data)

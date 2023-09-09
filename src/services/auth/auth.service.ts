@@ -7,6 +7,7 @@ import { TokenService } from '../token/token.service'
 import { UserDto } from '../../dtos/user.dto'
 import { ApiError } from '../../exceptions/api.error'
 import { IRegistration } from '../../types/auth.type'
+import { AuthError } from './auth.error'
 
 class AuthServiceClass {
 	static async createData(user: Model<IUser>) {
@@ -27,7 +28,7 @@ class AuthServiceClass {
 		})
 
 		if (is_account) {
-			throw ApiError.BadRequest(`User with the Email ${email} yet exist!`)
+			throw ApiError.BadRequest(AuthError.USER_EXIST(email))
 		}
 
 		const hash_password = await bcrypt.hash(password, 12)
@@ -41,7 +42,7 @@ class AuthServiceClass {
 		if (supervisor_id) {
 			await SupervisorModel.create<Model<ISupervisor>>({
 				subordinate_id: user.dataValues.id,
-				userId: supervisor_id,
+				userId: supervisor_id
 			})
 		}
 
@@ -54,7 +55,7 @@ class AuthServiceClass {
 		})
 
 		if (!user) {
-			throw ApiError.BadRequest(`User with the Email ${email} not found!`)
+			throw ApiError.BadRequest(AuthError.EMAIL_NOT_FOUND(email))
 		}
 
 		const is_passwords_equals = await bcrypt.compare(
@@ -63,13 +64,17 @@ class AuthServiceClass {
 		)
 
 		if (!is_passwords_equals) {
-			throw ApiError.BadRequest(`Dont correct password! ${password}`)
+			throw ApiError.BadRequest(AuthError.DONT_CORRECT_PASSWORD(password))
 		}
 
 		return AuthServiceClass.createData(user)
 	}
 
 	async logout(refresh_token: string) {
+		if (!refresh_token) {
+			throw ApiError.UnautorizedError()
+		}
+		
 		const token = await TokenService.removeToken(refresh_token)
 		return token
 	}

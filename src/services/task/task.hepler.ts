@@ -2,9 +2,16 @@ import { Model } from 'sequelize'
 
 import { ITask } from '../../types/task.type'
 import { UserDto } from '../../dtos/user.dto'
-import { ICreator, IResponsible, ISupervisor } from '../../types/user.type'
+import {
+	ICreator,
+	IResponsible,
+	ISupervisor,
+	IUser
+} from '../../types/user.type'
 
-export const formatResponsibleFromTasks = (tasks: Model<ITask>[]) => {
+export const formatResponsibleFromTasks = (
+	tasks: Model<ITask & { user: IUser }>[]
+) => {
 	return tasks.map(task => {
 		const { user, ...data } = task.dataValues
 		const userDto = new UserDto(user)
@@ -27,9 +34,7 @@ export const checkIsSubordinate = (
 	subordinates: Model<ISupervisor>[],
 	id: number[]
 ) => {
-	return subordinates.some(
-		user => id.includes(user.dataValues.subordinate_id)
-	)
+	return subordinates.some(user => id.includes(user.dataValues.subordinate_id))
 }
 
 export const checkIsCreator = (creator: Model<ICreator>, user_id: number) => {

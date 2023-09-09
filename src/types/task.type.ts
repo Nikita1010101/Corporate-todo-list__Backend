@@ -6,10 +6,13 @@ export interface ITask extends IDefaultValues {
 	description: string
 	deadline: string
 	update_date: string
-	priority: number
+	priority: 'high' | 'medium' | 'low'
 	status: boolean
 	userId: number
-	user: IUser
+}
+
+export interface IGetTask extends ITask {
+	responsible: IUser
 }
 
 export interface ICreateTask extends ITask {

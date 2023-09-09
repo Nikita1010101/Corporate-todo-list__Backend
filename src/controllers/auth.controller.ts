@@ -10,7 +10,9 @@ class AuthControllerClass {
 	static setCookies(res: Response, refresh_token: string) {
 		res.cookie(REFRESH_TOKEN, refresh_token, {
 			maxAge: 1000 * 60 * 60 * 24 * 30,
-			httpOnly: true
+			httpOnly: true,
+			sameSite: 'none',
+			secure: true
 		})
 	}
 
@@ -50,6 +52,9 @@ class AuthControllerClass {
 
 			AuthControllerClass.setCookies(res, user.refresh_token)
 
+			res.header('Access-Control-Allow-Origin', process.env.CLIENT_URL)
+			res.header('Access-Control-Allow-Crendentials', 'true')
+
 			res.send(user)
 		} catch (error) {
 			next(error)
@@ -62,7 +67,7 @@ class AuthControllerClass {
 		next: NextFunction
 	) => {
 		try {
-			const refresh_token = req.cookies.refresh_token as string
+			const { refresh_token } = req.cookies
 
 			const token = await AuthService.logout(refresh_token)
 

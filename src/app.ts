@@ -13,13 +13,13 @@ const app = express()
 const PORT = process.env.PORT || 7000
 
 app.use(express.json())
+app.use(cookieParser())
 app.use(
 	cors({
 		credentials: true,
 		origin: process.env.CLIENT_URL
 	})
 )
-app.use(cookieParser())
 app.use('/api', mainRouter)
 app.use(errorMiddleWare)
 

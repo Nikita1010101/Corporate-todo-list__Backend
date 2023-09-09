@@ -59,25 +59,25 @@ export const TokenService = {
 
 	validateAccessToken(access_token: string) {
 		try {
-			const is_access_token = jwt.verify(
+			const user = jwt.verify(
 				access_token,
 				process.env.JWT_ACCESS_SECRET_KEY
 			)
-			return is_access_token
+			return user
 		} catch (error) {
-			return null
+			throw error
 		}
 	},
 
 	validateRefreshToken(refresh_token: string) {
 		try {
-			const is_refresh_token = jwt.verify(
+			const user = jwt.verify(
 				refresh_token,
 				process.env.JWT_REFRESH_SECRET_KEY
 			)
-			return is_refresh_token
+			return user
 		} catch (error) {
-			return null
+			throw error
 		}
 	}
 }

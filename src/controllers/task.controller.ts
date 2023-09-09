@@ -11,6 +11,8 @@ class TaskControllerClass {
 		next: NextFunction
 	) => {
 		try {
+			console.log('user', req.user.id)
+
 			const user_id = req.user.id
 
 			const tasks = await TaskService.getTasks(user_id)
@@ -55,3 +57,4 @@ class TaskControllerClass {
 }
 
 export const TaskController = new TaskControllerClass()
+
